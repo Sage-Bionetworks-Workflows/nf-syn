@@ -2,22 +2,33 @@ package nextflow.synapse
 
 import groovy.util.logging.Slf4j
 
-import java.nio.file.FileStore
-import java.nio.file.FileSystem
-import java.nio.file.OpenOption
-import java.nio.file.Path
-import java.nio.file.PathMatcher
-import java.nio.file.WatchService
+import java.nio.file.*
 import java.nio.file.attribute.UserPrincipalLookupService
 import java.nio.file.spi.FileSystemProvider
 
 @Slf4j
 class SynapseFileSystem extends FileSystem {
+    private SynapseFileSystemProvider provider
+
+    private URI base
+
+    SynapseFileSystem(SynapseFileSystemProvider provider, URI base) {
+        log.info 'Inside SynapseFileSystem() from FileSystem'
+        log.info 'URI base: ' + base
+
+        this.provider = provider
+        this.base = base
+    }
+
     @Override
     FileSystemProvider provider() {
         log.info 'Inside provider() from FileSystem'
 
-        return new SynapseFileSystemProvider()
+        return provider
+    }
+
+    URI getBaseUri() {
+        return base
     }
 
     @Override
@@ -69,10 +80,11 @@ class SynapseFileSystem extends FileSystem {
     }
 
     @Override
-    Path getPath(String first, String... more) {
+    Path getPath(String path, String... more) {
         log.info 'Inside getPath() from FileSystem'
+        log.info 'from FileSystem -> getPath() -> Path: ' + path
 
-        return new SynapsePath()
+        return new SynapsePath(this, path)
     }
 
     @Override
@@ -96,11 +108,12 @@ class SynapseFileSystem extends FileSystem {
         return null
     }
 
-    InputStream newInputStream(Path path, OpenOption[] options) throws IOException {
+    static InputStream newInputStream(Path path, OpenOption[] options) throws IOException {
         log.info 'Inside newInputStream() from FileSystem'
+        log.info 'from FileSystem -> newInputStream() -> Path: ' + path.toString()
 
-        String initialString = "Tung is testing again!";
-        InputStream targetStream = new ByteArrayInputStream(initialString.getBytes());
-        return targetStream;
+        String initialString = "Tung is testing again!"
+        InputStream targetStream = new ByteArrayInputStream(initialString.getBytes())
+        return targetStream
     }
 }

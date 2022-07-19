@@ -2,28 +2,39 @@ package nextflow.synapse
 
 import groovy.util.logging.Slf4j
 
-import java.nio.file.FileSystem
-import java.nio.file.LinkOption
-import java.nio.file.Path
-import java.nio.file.WatchEvent
-import java.nio.file.WatchKey
-import java.nio.file.WatchService
+import java.nio.file.*
 
 @Slf4j
 class SynapsePath implements Path {
-    private final byte[] path
+    private static final String[] EMPTY = []
 
-    SynapsePath() {
-        log.info 'Inside SynapsePath() from Path'
+    public SynapseFileSystem fs
 
-        this.path = '/' as byte[]
+    private Path path
+
+    SynapsePath(SynapseFileSystem fs, String path) {
+        this(fs, path, EMPTY)
+    }
+
+    SynapsePath(SynapseFileSystem fs, String path, String[] more) {
+        this.fs = fs
+        this.path = Paths.get(path)
+    }
+
+    private SynapsePath(SynapseFileSystem fs, Path path, String query = null) {
+        this.fs = fs
+        this.path = path
+    }
+
+    private URI getBaseUri() {
+        fs?.getBaseUri()
     }
 
     @Override
-    FileSystem getFileSystem() {
+    SynapseFileSystem getFileSystem() {
         log.info 'Inside getFileSystem() from Path'
 
-        return new SynapseFileSystem()
+        return fs
     }
 
     @Override
@@ -92,8 +103,9 @@ class SynapsePath implements Path {
     @Override
     Path normalize() {
         log.info 'Inside normalize() from Path'
+        log.info 'Normalized path: ' + path.normalize()
 
-        return new SynapsePath()
+        return new SynapsePath(fs, path.normalize())
     }
 
     @Override
@@ -114,14 +126,19 @@ class SynapsePath implements Path {
     URI toUri() {
         log.info 'Inside toUri() from Path'
 
-        return null
+        return baseUri
+    }
+
+    @Override
+    String toString() {
+        return path.toString()
     }
 
     @Override
     Path toAbsolutePath() {
         log.info 'Inside toAbsolutePath() from Path'
 
-        return new SynapsePath()
+        return this
     }
 
     @Override

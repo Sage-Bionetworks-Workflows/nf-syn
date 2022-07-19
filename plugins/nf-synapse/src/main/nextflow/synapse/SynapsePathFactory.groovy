@@ -16,14 +16,13 @@
 
 package nextflow.synapse
 
-import nextflow.file.FileHelper
-
-import java.nio.file.FileSystem
-import java.nio.file.Path
-
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import nextflow.file.FileHelper
 import nextflow.file.FileSystemPathFactory
+
+import java.nio.file.Path
+
 /**
  * Create Azure path objects for az:// prefixed URIs
  *
@@ -38,54 +37,29 @@ class SynapsePathFactory extends FileSystemPathFactory {
     }
 
     @Override
-    protected Path parseUri(String uri) {
+    protected Path parseUri(String str) {
         log.info 'Inside parseUri() from FileSystemPathFactory'
 
-        if( !uri.startsWith('syn://') )
+        if (!str.startsWith('syn://'))
             return null
 
-        final cfg = new HashMap<>();
+        final uri = new URI(null, null, str, null, null)
 
-        // find the related file system
-        final fs = getFileSystem(uri0(uri), cfg)
+        log.info 'Starting getOrCreateFileSystemFor from parseUri() from FileSystemPathFactory'
+        final fs = FileHelper.getOrCreateFileSystemFor(uri)
 
-        // resulting az path
-        return fs.getPath('/')
-    }
+        log.info 'Starting provider() from parseUri() from FileSystemPathFactory'
+        final provider = fs.provider()
 
-    private URI uri0(String uri) {
-        log.info 'Inside uri0() from FileSystemPathFactory'
-
-        // note: this is needed to allow URI to handle curly brackets characters
-        // see https://github.com/nextflow-io/nextflow/issues/1969
-        new URI(null, null, uri, null, null)
-    }
-
-    protected FileSystem getFileSystem(URI uri, Map env) {
-        log.info 'Inside getFileSystem() from FileSystemPathFactory'
-
-        final bak = Thread.currentThread().getContextClassLoader()
-        // NOTE: setting the context classloader to allow loading azure deps via java ServiceLoader
-        // see
-        //  com.azure.core.http.HttpClientProvider
-        //  com.azure.core.http.netty.implementation.ReactorNettyClientProvider
-        //
-        try {
-            final loader = SynapsePlugin.class.getClassLoader()
-            log.debug "+ Setting context class loader to=$loader - previous=$bak"
-            Thread.currentThread().setContextClassLoader(loader)
-            return FileHelper.getOrCreateFileSystemFor(uri, env)
-        }
-        finally {
-            Thread.currentThread().setContextClassLoader(bak)
-        }
+        log.info 'Return getPath() from parseUri() from FileSystemPathFactory'
+        return provider.getPath(uri)
     }
 
     @Override
     protected String toUriString(Path path) {
         log.info 'Inside toUriString() from FileSystemPathFactory'
 
-        return path instanceof SynapsePath ? ((SynapsePath)path).toUriString() : null
+        return path instanceof SynapsePath ? ((SynapsePath) path).toUriString() : null
     }
 
     @Override

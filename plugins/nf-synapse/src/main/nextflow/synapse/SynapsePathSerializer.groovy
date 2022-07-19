@@ -35,15 +35,15 @@ class SynapsePathSerializer extends Serializer<SynapsePath> implements Serialize
 
     @Override
     void write(Kryo kryo, Output output, SynapsePath path) {
-        log.trace "Azure Blob storage path serialisation > path=$path"
+        log.trace "Synapse entity storage path serialisation > path=$path"
         output.writeString(path.toUriString())
     }
 
     @Override
     SynapsePath read(Kryo kryo, Input input, Class<SynapsePath> type) {
         final path = input.readString()
-        log.trace "Azure Blob storage path > path=$path"
-        return (SynapsePath)FileHelper.asPath(path)
+        log.trace "Synapse entity storage path > path=$path"
+        return (SynapsePath) FileHelper.asPath(path)
     }
 
     @Override

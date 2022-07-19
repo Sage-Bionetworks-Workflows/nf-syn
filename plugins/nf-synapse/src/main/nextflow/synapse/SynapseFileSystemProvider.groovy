@@ -3,14 +3,7 @@ package nextflow.synapse
 import groovy.util.logging.Slf4j
 
 import java.nio.channels.SeekableByteChannel
-import java.nio.file.AccessMode
-import java.nio.file.CopyOption
-import java.nio.file.DirectoryStream
-import java.nio.file.FileStore
-import java.nio.file.FileSystem
-import java.nio.file.LinkOption
-import java.nio.file.OpenOption
-import java.nio.file.Path
+import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.attribute.FileAttribute
 import java.nio.file.attribute.FileAttributeView
@@ -18,6 +11,8 @@ import java.nio.file.spi.FileSystemProvider
 
 @Slf4j
 class SynapseFileSystemProvider extends FileSystemProvider {
+    private Map<URI, FileSystem> fileSystemMap = new LinkedHashMap<>(20)
+
     @Override
     String getScheme() {
         log.info 'Inside getScheme() from FileSystemProvider'
@@ -29,22 +24,68 @@ class SynapseFileSystemProvider extends FileSystemProvider {
     FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
         log.info 'Inside newFileSystem() from FileSystemProvider'
 
-        return new SynapseFileSystem()
+        final scheme = uri.scheme.toLowerCase()
+
+        if (scheme != this.getScheme())
+            throw new IllegalArgumentException("Not a valid ${getScheme().toUpperCase()} scheme: $scheme")
+
+        final base = uri
+
+        log.info 'Inside newFileSystem() from FileSystemProvider'
+
+        if (fileSystemMap.containsKey(base))
+            throw new IllegalStateException("File system `$base` already exists")
+
+        return new SynapseFileSystem(this, base)
     }
 
     @Override
     FileSystem getFileSystem(URI uri) {
-        log.info 'Inside getFileSystem() from FileSystemProvider'
-        log.info 'URI is ' + uri
+        log.info 'Inside getFileSystem(URI uri) from FileSystemProvider'
 
-        return new SynapseFileSystem()
+        getFileSystem(uri, false)
+    }
+
+    FileSystem getFileSystem(URI uri, boolean canCreate) {
+        log.info 'Inside getFileSystem(URI uri, boolean canCreate) from FileSystemProvider'
+        log.info 'getFileSystem() from FileSystemProvider -> URI: ' + uri
+
+        assert fileSystemMap != null
+
+        final scheme = uri.scheme.toLowerCase()
+
+        if (scheme != this.getScheme())
+            throw new IllegalArgumentException("Not a valid ${getScheme().toUpperCase()} scheme: $scheme")
+
+        final key = uri
+
+        if (!canCreate) {
+            FileSystem result = fileSystemMap[key]
+            if (result == null)
+                throw new FileSystemNotFoundException("File system not found: $key")
+            return result
+        }
+
+        synchronized (fileSystemMap) {
+            FileSystem result = fileSystemMap[key]
+            if (result == null) {
+                result = newFileSystem(uri, Collections.emptyMap())
+                fileSystemMap[key] = result
+            }
+            return result
+        }
     }
 
     @Override
     Path getPath(URI uri) {
         log.info 'Inside getPath() from FileSystemProvider'
 
-        return new SynapsePath()
+        def path = uri.getSchemeSpecificPart()
+        path = path.substring(1)
+
+        log.info 'from FileSystemProvider -> getPath() -> Path: ' + path
+
+        return getFileSystem(uri, true).getPath(path)
     }
 
     @Override
@@ -57,8 +98,13 @@ class SynapseFileSystemProvider extends FileSystemProvider {
     @Override
     InputStream newInputStream(Path path, OpenOption... options) throws IOException {
         log.info 'Inside newInputStream() from FileSystemProvider'
+        log.info 'from FileSystemProvider -> newInputStream() -> Path: ' + path.toString()
 
-        return new SynapseFileSystem().newInputStream(path, options)
+        if (!(path instanceof SynapsePath)) {
+            throw new ProviderMismatchException()
+        }
+
+        return ((SynapsePath) path).getFileSystem().newInputStream(path, options)
     }
 
     @Override
@@ -120,14 +166,14 @@ class SynapseFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    def <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
+    <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
         log.info 'Inside getFileAttributeView() from FileSystemProvider'
 
         return null
     }
 
     @Override
-    def <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
+    <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
         log.info 'Inside readAttributes(Path path, Class<A> type, LinkOption... options) from FileSystemProvider'
 
         return null
