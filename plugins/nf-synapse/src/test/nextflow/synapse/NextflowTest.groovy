@@ -1,6 +1,5 @@
 /*
- * Copyright 2020-2022, Seqera Labs
- * Copyright 2013-2019, Centre for Genomic Regulation (CRG)
+ * Copyright 2022, Sage Bionetworks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nextflow.synapse
 
-import nextflow.Nextflow
-import nextflow.util.ArrayTuple
-import spock.lang.Requires
+import nextflow.file.FileHelper
 import spock.lang.Specification
 
 import java.nio.file.Files
-import java.nio.file.NoSuchFileException
 import java.nio.file.Paths
 
 /**
  *
- * @author Paolo Di Tommaso <paolo.ditommaso@gmail.com>
+ * @author Tung Nguyen <tung.nguyen@tungthecoder.dev>
  */
 class NextflowTest extends Specification {
 
-    def testFile() {
-         def myFile = Nextflow.file('syn://abc')
-        println(Files.readAllLines(myFile))
+    def testSynapseFile() {
+        def synapseFileProvider = FileHelper.getOrCreateFileSystemFor(new URI("syn://syn33295438")).provider()
+        def synapseFileInputStream = synapseFileProvider.newInputStream(Paths.get(new URI("syn://syn33295438")))
+
+        def synapseTestFile = new File("../../../SynapseTestCSVFile.csv")
+
+        if (synapseTestFile.exists()) {
+            synapseTestFile.delete()
+            synapseTestFile = new File("../../../SynapseTestCSVFile.csv")
+        }
+
+        Files.copy(synapseFileInputStream, synapseTestFile.toPath())
+
+        BufferedReader testFileReader = new BufferedReader(new FileReader(synapseTestFile));
+
+        int lineCount = 0;
+        while((testFileReader.readLine()) != null) {
+            lineCount++;
+        }
 
         expect:
-//        Nextflow.file('file.log').toFile() == new File('file.log').canonicalFile
-//        Nextflow.file('relative/file.test').toFile() == new File( new File('.').canonicalFile, 'relative/file.test')
-//        Nextflow.file('/user/home/file.log').toFile() == new File('/user/home/file.log')
-        1 == 1
+            lineCount == 106
     }
 
 }

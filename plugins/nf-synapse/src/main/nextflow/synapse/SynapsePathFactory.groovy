@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Microsoft Corp
+ * Copyright 2022, Sage Bionetworks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nextflow.synapse
 
 import groovy.transform.CompileStatic
@@ -24,9 +23,9 @@ import nextflow.file.FileSystemPathFactory
 import java.nio.file.Path
 
 /**
- * Create Azure path objects for az:// prefixed URIs
+ * Create Synapse path objects for syn:// prefixed URIs
  *
- * @author Paolo Di Tommaso <paolo.ditommaso@gmail.com>
+ * @author Tung Nguyen <tung.nguyen@tungthecoder.dev>
  */
 @Slf4j
 @CompileStatic
