@@ -146,7 +146,7 @@ class SynapseFileSystem extends FileSystem {
         return null
     }
 
-    static InputStream newInputStream(Path path, OpenOption[] options) throws IOException {
+    static InputStream newInputStream(Path path, OpenOption[] options, String token) throws IOException {
         log.info 'Inside newInputStream() from FileSystem'
         log.info 'from FileSystem -> newInputStream() -> Path: ' + path.toString()
 
@@ -154,7 +154,7 @@ class SynapseFileSystem extends FileSystem {
         log.info 'from FileSystem -> newInputStream() -> pathString: ' + pathString
 
         // Put your Synapse Auth Token here
-        String Synapse_Auth_Token = ""
+        String Synapse_Auth_Token = token
 
         CloseableHttpClient httpclient = HttpClients.createDefault()
         HttpClientContext context = HttpClientContext.create()

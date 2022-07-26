@@ -41,6 +41,9 @@ import java.nio.file.spi.FileSystemProvider
 @Slf4j
 class SynapseFileSystemProvider extends FileSystemProvider {
     private Map<URI, FileSystem> fileSystemMap = new LinkedHashMap<>(20)
+    public static final String SYNAPSE_AUTH_TOKEN = 'SYNAPSE_AUTH_TOKEN'
+    private Map<String,String> env = new HashMap<>(System.getenv())
+    private String authToken = null
 
     @Override
     String getScheme() {
@@ -50,9 +53,10 @@ class SynapseFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
+    FileSystem newFileSystem(URI uri, Map<String, ?> config) throws IOException {
         log.info 'Inside newFileSystem() from FileSystemProvider'
 
+        final authToken = config.get(SYNAPSE_AUTH_TOKEN) as String
         final scheme = uri.scheme.toLowerCase()
 
         if (scheme != this.getScheme())
@@ -64,6 +68,10 @@ class SynapseFileSystemProvider extends FileSystemProvider {
 
         if (fileSystemMap.containsKey(base))
             throw new IllegalStateException("File system `$base` already exists")
+
+        if(authToken) {
+            this.authToken = authToken
+        }
 
         return new SynapseFileSystem(this, base)
     }
@@ -98,7 +106,7 @@ class SynapseFileSystemProvider extends FileSystemProvider {
         synchronized (fileSystemMap) {
             FileSystem result = fileSystemMap[key]
             if (result == null) {
-                result = newFileSystem(uri, Collections.emptyMap())
+                result = newFileSystem(uri, env)
                 fileSystemMap[key] = result
             }
             return result
@@ -133,7 +141,7 @@ class SynapseFileSystemProvider extends FileSystemProvider {
             throw new ProviderMismatchException()
         }
 
-        return ((SynapsePath) path).getFileSystem().newInputStream(path, options)
+        return ((SynapsePath) path).getFileSystem().newInputStream(path, options, this.authToken)
     }
 
     @Override

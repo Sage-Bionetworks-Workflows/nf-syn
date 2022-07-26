@@ -28,14 +28,14 @@ import java.nio.file.Paths
 class NextflowTest extends Specification {
 
     def testSynapseFile() {
-        def synapseFileProvider = FileHelper.getOrCreateFileSystemFor(new URI("syn://syn33295438")).provider()
-        def synapseFileInputStream = synapseFileProvider.newInputStream(Paths.get(new URI("syn://syn33295438")))
+        def synapseFileProvider = FileHelper.getOrCreateFileSystemFor(new URI("syn://syn32193541")).provider()
+        def synapseFileInputStream = synapseFileProvider.newInputStream(Paths.get(new URI("syn://syn32193541")))
 
-        def synapseTestFile = new File("../../../SynapseTestCSVFile.csv")
+        def synapseTestFile = new File("../../../SynapseTestPDFFile.pdf")
 
         if (synapseTestFile.exists()) {
             synapseTestFile.delete()
-            synapseTestFile = new File("../../../SynapseTestCSVFile.csv")
+            synapseTestFile = new File("../../../SynapseTestPDFFile.pdf")
         }
 
         Files.copy(synapseFileInputStream, synapseTestFile.toPath())

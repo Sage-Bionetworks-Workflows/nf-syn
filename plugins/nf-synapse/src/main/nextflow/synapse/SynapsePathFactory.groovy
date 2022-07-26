@@ -43,9 +43,10 @@ class SynapsePathFactory extends FileSystemPathFactory {
             return null
 
         final uri = new URI(null, null, str, null, null)
+        final env = SynapseConfig.getConfig().getEnv()
 
         log.info 'Starting getOrCreateFileSystemFor from parseUri() from FileSystemPathFactory'
-        final fs = FileHelper.getOrCreateFileSystemFor(uri)
+        final fs = FileHelper.getOrCreateFileSystemFor(uri, env)
 
         log.info 'Starting provider() from parseUri() from FileSystemPathFactory'
         final provider = fs.provider()
