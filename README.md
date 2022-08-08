@@ -87,7 +87,7 @@ using the following steps:
 ## Package, upload and publish
 
 The project should hosted in a GitHub repository whose name should match the name of the plugin,
-that is the name of the directory in the `plugins` folder e.g. `nf-hello` in this project.
+that is the name of the directory in the `plugins` folder e.g. `nf-synapse` in this project.
 
 Following these step to package, upload and publish the plugin:
 

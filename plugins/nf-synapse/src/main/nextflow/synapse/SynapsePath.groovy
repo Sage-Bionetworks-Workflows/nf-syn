@@ -57,99 +57,99 @@ class SynapsePath implements Path {
 
     @Override
     SynapseFileSystem getFileSystem() {
-        log.info 'Inside getFileSystem() from Path'
+        log.trace 'Inside getFileSystem() from Path'
 
         return fs
     }
 
     @Override
     boolean isAbsolute() {
-        log.info 'Inside isAbsolute() from Path'
+        log.trace 'Inside isAbsolute() from Path'
 
-        return false
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Path getRoot() {
-        log.info 'Inside getRoot() from Path'
+        log.trace 'Inside getRoot() from Path'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Path getFileName() {
-        log.info 'Inside getFileName() from Path'
+        log.trace 'Inside getFileName() from Path'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Path getParent() {
-        log.info 'Inside getParent() from Path'
+        log.trace 'Inside getParent() from Path'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     int getNameCount() {
-        log.info 'Inside getNameCount() from Path'
+        log.trace 'Inside getNameCount() from Path'
 
-        return 0
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Path getName(int index) {
-        log.info 'Inside getName() from Path'
+        log.trace 'Inside getName() from Path'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Path subpath(int beginIndex, int endIndex) {
-        log.info 'Inside subpath() from Path'
+        log.trace 'Inside subpath() from Path'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     boolean startsWith(Path other) {
-        log.info 'Inside startsWith() from Path'
+        log.trace 'Inside startsWith() from Path'
 
-        return false
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     boolean endsWith(Path other) {
-        log.info 'Inside endsWith() from Path'
+        log.trace 'Inside endsWith() from Path'
 
-        return false
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Path normalize() {
-        log.info 'Inside normalize() from Path'
-        log.info 'Normalized path: ' + path.normalize()
+        log.trace 'Inside normalize() from Path'
+        log.trace 'Normalized path: ' + path.normalize()
 
         return new SynapsePath(fs, path.normalize())
     }
 
     @Override
     Path resolve(Path other) {
-        log.info 'Inside resolve() from Path'
+        log.trace 'Inside resolve() from Path'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Path relativize(Path other) {
-        log.info 'Inside relativize() from Path'
+        log.trace 'Inside relativize() from Path'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     URI toUri() {
-        log.info 'Inside toUri() from Path'
+        log.trace 'Inside toUri() from Path'
 
         return baseUri
     }
@@ -161,29 +161,29 @@ class SynapsePath implements Path {
 
     @Override
     Path toAbsolutePath() {
-        log.info 'Inside toAbsolutePath() from Path'
+        log.trace 'Inside toAbsolutePath() from Path'
 
         return this
     }
 
     @Override
     Path toRealPath(LinkOption... options) throws IOException {
-        log.info 'Inside toRealPath() from Path'
+        log.trace 'Inside toRealPath() from Path'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     WatchKey register(WatchService watcher, WatchEvent.Kind<?>[] events, WatchEvent.Modifier... modifiers) throws IOException {
-        log.info 'Inside register() from Path'
+        log.trace 'Inside register() from Path'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     int compareTo(Path other) {
-        log.info 'Inside compareTo() from Path'
+        log.trace 'Inside compareTo() from Path'
 
-        return 0
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 }

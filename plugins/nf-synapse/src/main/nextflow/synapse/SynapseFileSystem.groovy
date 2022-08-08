@@ -32,7 +32,6 @@ import org.apache.http.util.EntityUtils
 import java.nio.charset.StandardCharsets
 import java.nio.file.FileStore
 import java.nio.file.FileSystem
-import java.nio.file.OpenOption
 import java.nio.file.Path
 import java.nio.file.PathMatcher
 import java.nio.file.WatchService
@@ -51,8 +50,8 @@ class SynapseFileSystem extends FileSystem {
     private URI base
 
     SynapseFileSystem(SynapseFileSystemProvider provider, URI base) {
-        log.info 'Inside SynapseFileSystem() from FileSystem'
-        log.info 'URI base: ' + base
+        log.trace 'Inside SynapseFileSystem() from FileSystem'
+        log.trace 'URI base: ' + base
 
         this.provider = provider
         this.base = base
@@ -60,7 +59,7 @@ class SynapseFileSystem extends FileSystem {
 
     @Override
     FileSystemProvider provider() {
-        log.info 'Inside provider() from FileSystem'
+        log.trace 'Inside provider() from FileSystem'
 
         return provider
     }
@@ -71,87 +70,87 @@ class SynapseFileSystem extends FileSystem {
 
     @Override
     void close() throws IOException {
-        log.info 'Inside close() from FileSystem'
+        log.trace 'Inside close() from FileSystem'
 
     }
 
     @Override
     boolean isOpen() {
-        log.info 'Inside isOpen() from FileSystem'
+        log.trace 'Inside isOpen() from FileSystem'
 
-        return false
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     boolean isReadOnly() {
-        log.info 'Inside isReadOnly() from FileSystem'
+        log.trace 'Inside isReadOnly() from FileSystem'
 
-        return false
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     String getSeparator() {
-        log.info 'Inside getSeparator() from FileSystem'
+        log.trace 'Inside getSeparator() from FileSystem'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Iterable<Path> getRootDirectories() {
-        log.info 'Inside getRootDirectories() from FileSystem'
+        log.trace 'Inside getRootDirectories() from FileSystem'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Iterable<FileStore> getFileStores() {
-        log.info 'Inside getFileStores() from FileSystem'
+        log.trace 'Inside getFileStores() from FileSystem'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Set<String> supportedFileAttributeViews() {
-        log.info 'Inside supportedFileAttributeViews() from FileSystem'
+        log.trace 'Inside supportedFileAttributeViews() from FileSystem'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Path getPath(String path, String... more) {
-        log.info 'Inside getPath() from FileSystem'
-        log.info 'from FileSystem -> getPath() -> Path: ' + path
+        log.trace 'Inside getPath() from FileSystem'
+        log.trace 'from FileSystem -> getPath() -> Path: ' + path
 
         return new SynapsePath(this, path)
     }
 
     @Override
     PathMatcher getPathMatcher(String syntaxAndPattern) {
-        log.info 'Inside getPathMatcher() from FileSystem'
+        log.trace 'Inside getPathMatcher() from FileSystem'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     UserPrincipalLookupService getUserPrincipalLookupService() {
-        log.info 'Inside getUserPrincipalLookupService() from FileSystem'
+        log.trace 'Inside getUserPrincipalLookupService() from FileSystem'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     WatchService newWatchService() throws IOException {
-        log.info 'Inside newWatchService() from FileSystem'
+        log.trace 'Inside newWatchService() from FileSystem'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
-    static InputStream newInputStream(Path path, OpenOption[] options, String token) throws IOException {
-        log.info 'Inside newInputStream() from FileSystem'
-        log.info 'from FileSystem -> newInputStream() -> Path: ' + path.toString()
+    static InputStream newInputStream(Path path, String token) throws IOException {
+        log.trace 'Inside newInputStream() from FileSystem'
+        log.trace 'from FileSystem -> newInputStream() -> Path: ' + path.toString()
 
         String pathString = path.toString().substring(1)
-        log.info 'from FileSystem -> newInputStream() -> pathString: ' + pathString
+        log.trace 'from FileSystem -> newInputStream() -> pathString: ' + pathString
 
         // Put your Synapse Auth Token here
         String Synapse_Auth_Token = token
@@ -164,10 +163,15 @@ class SynapseFileSystem extends FileSystem {
         HttpResponse entityIDGetResponse = httpclient.execute(entityIDGet)
         HttpEntity entityIDGetEntity = entityIDGetResponse.getEntity()
 
-        String entityIDGetResStr = EntityUtils.toString(entityIDGetEntity, StandardCharsets.UTF_8);
-        JsonObject entityIDGetResObj = new JsonParser().parse(entityIDGetResStr).getAsJsonObject();
+        String entityIDGetResStr = EntityUtils.toString(entityIDGetEntity, StandardCharsets.UTF_8)
+        JsonObject entityIDGetResObj = new JsonParser().parse(entityIDGetResStr).getAsJsonObject()
 
-        Integer dataFileHandleId = (Integer) entityIDGetResObj.get("dataFileHandleId").getAsBigInteger();
+        if(!entityIDGetResObj.get("dataFileHandleId")) {
+            throw new IOException("Cannot retrieve response from: " + entityIDGet.toString()
+                    + "\nPlease check your token, try again later or raise a bug ticket!")
+        }
+
+        Integer dataFileHandleId = (Integer) entityIDGetResObj.get("dataFileHandleId").getAsBigInteger()
 
         HttpGet absoluteURLGet = new HttpGet("https://repo-prod.prod.sagebase.org/file/v1/file/" + dataFileHandleId + "?fileAssociateType=FileEntity&fileAssociateId=" + dataFileHandleId)
         absoluteURLGet.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + Synapse_Auth_Token)
@@ -182,7 +186,7 @@ class SynapseFileSystem extends FileSystem {
         HttpEntity fileContentGetEntity = fileContentGetResponse.getEntity()
 
         InputStream inputStream = fileContentGetEntity.getContent()
-        log.info('Stream' + inputStream)
+        log.trace('Stream' + inputStream)
 
         return inputStream
     }

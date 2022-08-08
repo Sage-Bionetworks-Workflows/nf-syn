@@ -16,6 +16,7 @@
 package nextflow.synapse
 
 import nextflow.file.FileHelper
+import spock.lang.Requires
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -25,10 +26,14 @@ import java.nio.file.Paths
  *
  * @author Tung Nguyen <tung.nguyen@tungthecoder.dev>
  */
-class NextflowTest extends Specification {
+@Requires({System.getenv('SYNAPSE_AUTH_TOKEN')})
+class SynapseTest extends Specification {
 
     def testSynapseFile() {
-        def synapseFileProvider = FileHelper.getOrCreateFileSystemFor(new URI("syn://syn32193541")).provider()
+        def props = new HashMap<>();
+        props.put(SynapseFileSystemProvider.SYNAPSE_AUTH_TOKEN, System.getenv('SYNAPSE_AUTH_TOKEN'))
+
+        def synapseFileProvider = FileHelper.getOrCreateFileSystemFor(new URI("syn://syn32193541"), props).provider()
         def synapseFileInputStream = synapseFileProvider.newInputStream(Paths.get(new URI("syn://syn32193541")))
 
         def synapseTestFile = new File("../../../SynapseTestPDFFile.pdf")
@@ -40,15 +45,15 @@ class NextflowTest extends Specification {
 
         Files.copy(synapseFileInputStream, synapseTestFile.toPath())
 
-        BufferedReader testFileReader = new BufferedReader(new FileReader(synapseTestFile));
+        def testFileReader = new BufferedReader(new FileReader(synapseTestFile));
 
-        int lineCount = 0;
+        def lineCount = 0;
         while((testFileReader.readLine()) != null) {
             lineCount++;
         }
 
         expect:
-            lineCount == 106
+            lineCount == 3075
     }
 
 }

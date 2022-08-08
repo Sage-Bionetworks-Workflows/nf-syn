@@ -4,6 +4,7 @@
 .nextflow
 .nextflow.*
 .DS_Store
+trace_log.*
 
 # Ignore Gradle build output directory
 build

@@ -32,12 +32,12 @@ import java.nio.file.Path
 class SynapsePathFactory extends FileSystemPathFactory {
 
     SynapsePathFactory() {
-        log.info 'Inside SynapsePathFactory() from FileSystemPathFactory'
+        log.trace 'Inside SynapsePathFactory() from FileSystemPathFactory'
     }
 
     @Override
     protected Path parseUri(String str) {
-        log.info 'Inside parseUri() from FileSystemPathFactory'
+        log.trace 'Inside parseUri() from FileSystemPathFactory'
 
         if (!str.startsWith('syn://'))
             return null
@@ -45,34 +45,34 @@ class SynapsePathFactory extends FileSystemPathFactory {
         final uri = new URI(null, null, str, null, null)
         final env = SynapseConfig.getConfig().getEnv()
 
-        log.info 'Starting getOrCreateFileSystemFor from parseUri() from FileSystemPathFactory'
+        log.trace 'Starting getOrCreateFileSystemFor from parseUri() from FileSystemPathFactory'
         final fs = FileHelper.getOrCreateFileSystemFor(uri, env)
 
-        log.info 'Starting provider() from parseUri() from FileSystemPathFactory'
+        log.trace 'Starting provider() from parseUri() from FileSystemPathFactory'
         final provider = fs.provider()
 
-        log.info 'Return getPath() from parseUri() from FileSystemPathFactory'
+        log.trace 'Return getPath() from parseUri() from FileSystemPathFactory'
         return provider.getPath(uri)
     }
 
     @Override
     protected String toUriString(Path path) {
-        log.info 'Inside toUriString() from FileSystemPathFactory'
+        log.trace 'Inside toUriString() from FileSystemPathFactory'
 
         return path instanceof SynapsePath ? ((SynapsePath) path).toUriString() : null
     }
 
     @Override
     protected String getBashLib(Path target) {
-        log.info 'Inside getBashLib() from FileSystemPathFactory'
+        log.trace 'Inside getBashLib() from FileSystemPathFactory'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     protected String getUploadCmd(String source, Path target) {
-        log.info 'Inside getUploadCmd() from FileSystemPathFactory'
+        log.trace 'Inside getUploadCmd() from FileSystemPathFactory'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 }
