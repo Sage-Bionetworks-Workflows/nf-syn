@@ -1,10 +1,6 @@
-# nf-hello plugin 
+# nf-synapse plugin 
  
-This project shows how to implement a simple Nextflow plugin named `nf-hello` that intercepts 
-workflow execution events to print a message when the execution starts and on workflow completion.
-
-Also, this plugin enriches the `channel` with a `producer` a `consumer` methods (`sayHello` and `goodbye`)
-allowing to include them into the script 
+This project shows how to implement a simple Nextflow plugin named `nf-synapse` that implements the support for Synapse's Entity storage with customized Synapse File System Provider.
 
 ## Plugin assets 
                     
@@ -12,32 +8,32 @@ allowing to include them into the script
     
     Gradle project settings. 
 
-- `plugins/nf-hello`
+- `plugins/nf-synapse`
     
     The plugin implementation base directory.
 
-- `plugins/nf-hello/build.gradle` 
+- `plugins/nf-synapse/build.gradle` 
     
     Plugin Gradle build file. Project dependencies should be added here.
 
-- `plugins/nf-hello/src/resources/META-INF/MANIFEST.MF` 
+- `plugins/nf-synapse/src/resources/META-INF/MANIFEST.MF` 
     
     Manifest file defining the plugin attributes e.g. name, version, etc.
     The attribute `Plugin-Class` declares the plugin main class. This class 
     should extend the base class `nextflow.plugin.BasePlugin` e.g. 
     `nextflow.synapse.SynapsePlugin`.
 
-- `plugins/nf-hello/src/resources/META-INF/extensions.idx`
+- `plugins/nf-synapse/src/resources/META-INF/extensions.idx`
     
     This file declares one or more extension classes provided by the plugin. 
     Each line should contain a Java class fully qualified name implementing 
     the interface `org.pf4j.ExtensionPoint` (or a sub-interface).
 
-- `plugins/nf-hello/src/main` 
+- `plugins/nf-synapse/src/main` 
 
     The plugin implementation sources.
 
-- `plugins/nf-hello/src/test` 
+- `plugins/nf-synapse/src/test` 
                              
     The plugin unit tests. 
 
@@ -63,39 +59,35 @@ Run the following command in the project root directory (ie. where the file `set
 
 To run and test the plugin in the development environment, configure a local Nextflow build 
 using the following steps:
-
-1. Clone the Nextflow repository in your computer into a sibling directory:
-
+1. Create a root folder for the whole project & cd into the folder:
+    ````
+    mkdir nfSynapseProject && cd nfSynapseProject
+    ````
+2. Clone this repo: `nf-synapse` while inside `nfSynapseProject` with:
+    ````
+    git clone https://github.com/Sage-Bionetworks-Workflows/nf-synapse.git
+    ````
+3. Clone the Nextflow while inside `nfSynapseProject` with:
+    ````
+    git clone https://github.com/nextflow-io/nextflow.git
+    ````
+4. Cd into folder `nextflow` & build the local Nextflow source code with:
     ```
-    git clone --depth 1 https://github.com/nextflow-io/nextflow ../nextflow
+    cd nextflow && ./gradlew compile exportClasspath
     ```
-  
-2. Instruct the plugin build setting to use the local Nextflow code, adding the following 
-  line in the file `settings.gradle`: 
-   
+5. Cd into folder `nf-synapse` & compile the plugin source code:
     ```
-    echo "includeBuild('../nextflow')" >> settings.gradle
+    cd ../nf-synapse && ./gradlew compileGroovy
     ```
-  
-  (make sure to not add it more than once..)
-
-3. Compile the plugin along the Nextflow code, with this command:
-
+6. While inside `nf-synapse`, run Nextflow with `nf-synapse` plugin on the sample file `synapse_file.nf` (created in this repo) using:
     ```
-    ./gradlew compileGroovy
-    ```
-
-4. Run Nextflow with plugins using the `./launch.sh` script as a drop-in replacement for the `nextflow` command and 
-  adding the option `-plugins nf-hello` to load the built plugin:
-   
-    ```
-    ./launch.sh run nextflow-io/hello -plugins nf-hello
+    ./launch.sh run synapse_file.nf -plugins nf-synapse
     ```
 
 ## Package, upload and publish
 
 The project should hosted in a GitHub repository whose name should match the name of the plugin,
-that is the name of the directory in the `plugins` folder e.g. `nf-hello` in this project.
+that is the name of the directory in the `plugins` folder e.g. `nf-synapse` in this project.
 
 Following these step to package, upload and publish the plugin:
 
@@ -110,7 +102,7 @@ Following these step to package, upload and publish the plugin:
 2. The following command, package and upload the plugin in the GitHub project releases page:
 
     ```
-    ./gradlew :plugins:nf-hello:upload
+    ./gradlew :plugins:nf-synapse:upload
     ```
 
 3. Create a pull request against the [nextflow-io/plugins](https://github.com/nextflow-io/plugins/blob/main/plugins.json) 

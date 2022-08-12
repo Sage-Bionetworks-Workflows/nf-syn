@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Microsoft Corp
+ * Copyright 2022, Sage Bionetworks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import nextflow.util.SerializerRegistrant
 /**
  * Implements Serializer for {@link SynapsePath} objects
  *
- * @author Paolo Di Tommaso <paolo.ditommaso@gmail.com>
+ * @author Tung Nguyen <tung.nguyen@tungthecoder.dev>
  */
 @Slf4j
 @CompileStatic
@@ -35,15 +35,15 @@ class SynapsePathSerializer extends Serializer<SynapsePath> implements Serialize
 
     @Override
     void write(Kryo kryo, Output output, SynapsePath path) {
-        log.trace "Azure Blob storage path serialisation > path=$path"
+        log.trace "Synapse entity storage path serialisation > path=$path"
         output.writeString(path.toUriString())
     }
 
     @Override
     SynapsePath read(Kryo kryo, Input input, Class<SynapsePath> type) {
         final path = input.readString()
-        log.trace "Azure Blob storage path > path=$path"
-        return (SynapsePath)FileHelper.asPath(path)
+        log.trace "Synapse entity storage path > path=$path"
+        return (SynapsePath) FileHelper.asPath(path)
     }
 
     @Override

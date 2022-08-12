@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Microsoft Corp
+ * Copyright 2022, Sage Bionetworks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,92 +13,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nextflow.synapse
-
-import nextflow.file.FileHelper
-
-import java.nio.file.FileSystem
-import java.nio.file.Path
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import nextflow.file.FileHelper
 import nextflow.file.FileSystemPathFactory
+
+import java.nio.file.Path
+
 /**
- * Create Azure path objects for az:// prefixed URIs
+ * Create Synapse path objects for syn:// prefixed URIs
  *
- * @author Paolo Di Tommaso <paolo.ditommaso@gmail.com>
+ * @author Tung Nguyen <tung.nguyen@tungthecoder.dev>
  */
 @Slf4j
 @CompileStatic
 class SynapsePathFactory extends FileSystemPathFactory {
 
     SynapsePathFactory() {
-        log.info 'Inside SynapsePathFactory() from FileSystemPathFactory'
+        log.trace 'Inside SynapsePathFactory() from FileSystemPathFactory'
     }
 
     @Override
-    protected Path parseUri(String uri) {
-        log.info 'Inside parseUri() from FileSystemPathFactory'
+    protected Path parseUri(String str) {
+        log.trace 'Inside parseUri() from FileSystemPathFactory'
 
-        if( !uri.startsWith('syn://') )
+        if (!str.startsWith('syn://'))
             return null
 
-        final cfg = new HashMap<>();
+        final uri = new URI(null, null, str, null, null)
+        final env = SynapseConfig.getConfig().getEnv()
 
-        // find the related file system
-        final fs = getFileSystem(uri0(uri), cfg)
+        log.trace 'Starting getOrCreateFileSystemFor from parseUri() from FileSystemPathFactory'
+        final fs = FileHelper.getOrCreateFileSystemFor(uri, env)
 
-        // resulting az path
-        return fs.getPath('/')
-    }
+        log.trace 'Starting provider() from parseUri() from FileSystemPathFactory'
+        final provider = fs.provider()
 
-    private URI uri0(String uri) {
-        log.info 'Inside uri0() from FileSystemPathFactory'
-
-        // note: this is needed to allow URI to handle curly brackets characters
-        // see https://github.com/nextflow-io/nextflow/issues/1969
-        new URI(null, null, uri, null, null)
-    }
-
-    protected FileSystem getFileSystem(URI uri, Map env) {
-        log.info 'Inside getFileSystem() from FileSystemPathFactory'
-
-        final bak = Thread.currentThread().getContextClassLoader()
-        // NOTE: setting the context classloader to allow loading azure deps via java ServiceLoader
-        // see
-        //  com.azure.core.http.HttpClientProvider
-        //  com.azure.core.http.netty.implementation.ReactorNettyClientProvider
-        //
-        try {
-            final loader = SynapsePlugin.class.getClassLoader()
-            log.debug "+ Setting context class loader to=$loader - previous=$bak"
-            Thread.currentThread().setContextClassLoader(loader)
-            return FileHelper.getOrCreateFileSystemFor(uri, env)
-        }
-        finally {
-            Thread.currentThread().setContextClassLoader(bak)
-        }
+        log.trace 'Return getPath() from parseUri() from FileSystemPathFactory'
+        return provider.getPath(uri)
     }
 
     @Override
     protected String toUriString(Path path) {
-        log.info 'Inside toUriString() from FileSystemPathFactory'
+        log.trace 'Inside toUriString() from FileSystemPathFactory'
 
-        return path instanceof SynapsePath ? ((SynapsePath)path).toUriString() : null
+        return path instanceof SynapsePath ? ((SynapsePath) path).toUriString() : null
     }
 
     @Override
     protected String getBashLib(Path target) {
-        log.info 'Inside getBashLib() from FileSystemPathFactory'
+        log.trace 'Inside getBashLib() from FileSystemPathFactory'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     protected String getUploadCmd(String source, Path target) {
-        log.info 'Inside getUploadCmd() from FileSystemPathFactory'
+        log.trace 'Inside getUploadCmd() from FileSystemPathFactory'
 
-        return null
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 }
