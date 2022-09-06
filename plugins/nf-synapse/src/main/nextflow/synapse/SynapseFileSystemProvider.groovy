@@ -15,14 +15,16 @@
  */
 package nextflow.synapse
 
+import groovy.transform.Memoized
 import groovy.util.logging.Slf4j
+import org.sagebionetworks.client.SynapseClientImpl
 
 import java.nio.channels.SeekableByteChannel
 import java.nio.file.AccessMode
 import java.nio.file.CopyOption
 import java.nio.file.DirectoryStream
 import java.nio.file.FileStore
-import java.nio.file.FileSystem
+import java.nio.file.FileSystemAlreadyExistsException
 import java.nio.file.FileSystemNotFoundException
 import java.nio.file.LinkOption
 import java.nio.file.OpenOption
@@ -40,7 +42,7 @@ import java.nio.file.spi.FileSystemProvider
  */
 @Slf4j
 class SynapseFileSystemProvider extends FileSystemProvider {
-    private Map<URI, FileSystem> fileSystemMap = new LinkedHashMap<>(20)
+    private Map<URI, SynapseFileSystem> fileSystemMap = [:]
     public static final String SYNAPSE_AUTH_TOKEN = 'SYNAPSE_AUTH_TOKEN'
     private Map<String,String> env = new HashMap<>(System.getenv())
     private String authToken = null
@@ -52,75 +54,84 @@ class SynapseFileSystemProvider extends FileSystemProvider {
         return "syn"
     }
 
-    @Override
-    FileSystem newFileSystem(URI uri, Map<String, ?> config) throws IOException {
-        log.trace 'Inside newFileSystem() from FileSystemProvider'
+    @Memoized
+    protected static SynapseClientImpl createSynapseClientWithToken(String authToken) {
+        log.trace "Creating Synapse Client with authToken: ${authToken}"
 
-        final authToken = config.get(SYNAPSE_AUTH_TOKEN) as String
-        final scheme = uri.scheme.toLowerCase()
+        final synapseClient = new SynapseClientImpl()
+        synapseClient.setBearerAuthorizationToken(authToken)
 
-        if (scheme != this.getScheme())
-            throw new IllegalArgumentException("Not a valid ${getScheme().toUpperCase()} scheme: $scheme")
-
-        final base = uri
-
-        log.trace 'Inside newFileSystem() from FileSystemProvider'
-
-        if (fileSystemMap.containsKey(base))
-            throw new IllegalStateException("File system `$base` already exists")
-
-        if(authToken) {
-            this.authToken = authToken
-        }
-
-        return new SynapseFileSystem(this, base)
+        return synapseClient
     }
 
     @Override
-    FileSystem getFileSystem(URI uri) {
+    SynapseFileSystem newFileSystem(URI uri, Map<String, ?> config) throws IOException {
+        log.trace 'Inside newFileSystem() from FileSystemProvider'
+
+        if(fileSystemMap.containsKey(uri))
+            throw new FileSystemAlreadyExistsException("File system already exists for entity: `$uri`")
+
+        final authToken = config.get(SYNAPSE_AUTH_TOKEN) as String
+        if(!authToken)
+            throw new IllegalArgumentException("Missing SYNAPSE_AUTH_TOKEN!")
+        this.authToken = authToken
+
+        final synapseClient = createSynapseClientWithToken(authToken)
+        final synID = getSynIDFromURI(uri)
+        final entity = synapseClient.getEntityById(synID)
+        final entityTypeArr = entity.getConcreteType().split("\\.")
+        final entityType = entityTypeArr[entityTypeArr.size() - 1]
+
+        if(entityType != 'FileEntity') {
+            throw new IllegalArgumentException("Entity type: " + entityType + " is not supported. Only entity type: FileEntity is supported!")
+        }
+
+        final result = new SynapseFileSystem(this, uri, synapseClient)
+        fileSystemMap[uri] = result
+
+        return result
+    }
+
+    static String getSynIDFromURI(URI uri) {
+        final synID = uri.getSchemeSpecificPart().substring(2)
+
+        return synID
+    }
+
+    @Override
+    SynapseFileSystem getFileSystem(URI uri) {
         log.trace 'Inside getFileSystem(URI uri) from FileSystemProvider'
 
         getFileSystem(uri, false)
     }
 
-    FileSystem getFileSystem(URI uri, boolean canCreate) {
+    SynapseFileSystem getFileSystem(URI uri, boolean canCreate) {
         log.trace 'Inside getFileSystem(URI uri, boolean canCreate) from FileSystemProvider'
-        log.trace 'getFileSystem() from FileSystemProvider -> URI: ' + uri
-
-        assert fileSystemMap != null
 
         final scheme = uri.scheme.toLowerCase()
 
         if (scheme != this.getScheme())
             throw new IllegalArgumentException("Not a valid ${getScheme().toUpperCase()} scheme: $scheme")
 
-        final key = uri
+        def fs = fileSystemMap.get(uri)
 
-        if (!canCreate) {
-            FileSystem result = fileSystemMap[key]
-            if (result == null)
-                throw new FileSystemNotFoundException("File system not found: $key")
-            return result
-        }
-
-        synchronized (fileSystemMap) {
-            FileSystem result = fileSystemMap[key]
-            if (result == null) {
-                result = newFileSystem(uri, env)
-                fileSystemMap[key] = result
+        if(!fs) {
+            if(canCreate) {
+                fs = newFileSystem(uri, env)
+            } else {
+                throw new FileSystemNotFoundException("Missing Synapse file system for entity: `$uri`")
             }
-            return result
         }
+
+        return fs
     }
 
     @Override
-    Path getPath(URI uri) {
+    SynapsePath getPath(URI uri) {
         log.trace 'Inside getPath() from FileSystemProvider'
 
         def path = uri.getSchemeSpecificPart()
         path = path.substring(1)
-
-        log.trace 'from FileSystemProvider -> getPath() -> Path: ' + path
 
         return getFileSystem(uri, true).getPath(path)
     }
@@ -141,7 +152,11 @@ class SynapseFileSystemProvider extends FileSystemProvider {
             throw new ProviderMismatchException()
         }
 
-        return ((SynapsePath) path).getFileSystem().newInputStream(path, this.authToken)
+        final synapsePath = (SynapsePath) path
+        log.trace 'from FileSystemProvider -> newInputStream() -> Path -> after synapsePath: ' + authToken
+        log.trace 'from FileSystemProvider -> newInputStream() -> Path -> after synapsePath: ' + synapsePath.synapseClient()
+
+        return synapsePath.getFileSystem().newInputStream(synapsePath)
     }
 
     @Override

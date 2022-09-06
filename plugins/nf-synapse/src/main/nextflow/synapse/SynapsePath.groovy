@@ -16,6 +16,7 @@
 package nextflow.synapse
 
 import groovy.util.logging.Slf4j
+import org.sagebionetworks.client.SynapseClientImpl
 
 import java.nio.file.LinkOption
 import java.nio.file.Path
@@ -31,22 +32,16 @@ import java.nio.file.WatchService
  */
 @Slf4j
 class SynapsePath implements Path {
-    private static final String[] EMPTY = []
-
     public SynapseFileSystem fs
 
     private Path path
 
     SynapsePath(SynapseFileSystem fs, String path) {
-        this(fs, path, EMPTY)
-    }
-
-    SynapsePath(SynapseFileSystem fs, String path, String[] more) {
         this.fs = fs
         this.path = Paths.get(path)
     }
 
-    private SynapsePath(SynapseFileSystem fs, Path path, String query = null) {
+    private SynapsePath(SynapseFileSystem fs, Path path) {
         this.fs = fs
         this.path = path
     }
@@ -60,6 +55,10 @@ class SynapsePath implements Path {
         log.trace 'Inside getFileSystem() from Path'
 
         return fs
+    }
+
+    SynapseClientImpl synapseClient() {
+        return fs.getSynapseClient()
     }
 
     @Override

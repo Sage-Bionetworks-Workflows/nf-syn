@@ -15,21 +15,12 @@
  */
 package nextflow.synapse
 
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import groovy.util.logging.Slf4j
-import org.apache.http.HttpEntity
-import org.apache.http.HttpHeaders
-import org.apache.http.HttpHost
-import org.apache.http.HttpResponse
 import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.protocol.HttpClientContext
-import org.apache.http.client.utils.URIUtils
-import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
-import org.apache.http.util.EntityUtils
-
-import java.nio.charset.StandardCharsets
+import org.sagebionetworks.client.SynapseClientImpl
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType
+import org.sagebionetworks.repo.model.file.FileHandleAssociation
 import java.nio.file.FileStore
 import java.nio.file.FileSystem
 import java.nio.file.Path
@@ -49,12 +40,15 @@ class SynapseFileSystem extends FileSystem {
 
     private URI base
 
-    SynapseFileSystem(SynapseFileSystemProvider provider, URI base) {
+    private SynapseClientImpl synapseClient
+
+    SynapseFileSystem(SynapseFileSystemProvider provider, URI base, SynapseClientImpl synapseClient) {
         log.trace 'Inside SynapseFileSystem() from FileSystem'
         log.trace 'URI base: ' + base
 
         this.provider = provider
         this.base = base
+        this.synapseClient = synapseClient
     }
 
     @Override
@@ -65,13 +59,22 @@ class SynapseFileSystem extends FileSystem {
     }
 
     URI getBaseUri() {
+        log.trace 'Inside getBaseUri() from FileSystem'
+
         return base
+    }
+
+    SynapseClientImpl getSynapseClient() {
+        log.trace 'Inside getSynapseClient() from FileSystem'
+
+        return synapseClient
     }
 
     @Override
     void close() throws IOException {
         log.trace 'Inside close() from FileSystem'
 
+        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
@@ -117,9 +120,8 @@ class SynapseFileSystem extends FileSystem {
     }
 
     @Override
-    Path getPath(String path, String... more) {
+    SynapsePath getPath(String path, String... more) {
         log.trace 'Inside getPath() from FileSystem'
-        log.trace 'from FileSystem -> getPath() -> Path: ' + path
 
         return new SynapsePath(this, path)
     }
@@ -145,48 +147,31 @@ class SynapseFileSystem extends FileSystem {
         throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
-    static InputStream newInputStream(Path path, String token) throws IOException {
+    static InputStream newInputStream(SynapsePath path) throws IOException {
         log.trace 'Inside newInputStream() from FileSystem'
         log.trace 'from FileSystem -> newInputStream() -> Path: ' + path.toString()
 
-        String pathString = path.toString().substring(1)
-        log.trace 'from FileSystem -> newInputStream() -> pathString: ' + pathString
+        final entityId = path.toString().substring(1)
+        final synapseClient = path.synapseClient()
 
-        // Put your Synapse Auth Token here
-        String Synapse_Auth_Token = token
+        final entity = synapseClient.getEntityById(entityId)
+        final entityTypeArr = entity.getConcreteType().split("\\.")
+        final entityType = FileHandleAssociateType.valueOf(entityTypeArr[entityTypeArr.size() - 1])
 
-        CloseableHttpClient httpclient = HttpClients.createDefault()
-        HttpClientContext context = HttpClientContext.create()
+        final fileHandle = synapseClient.getEntityFileHandlesForCurrentVersion(entityId).getList().get(0)
+        final fileHandleAssociation = new FileHandleAssociation()
+                                                        .setFileHandleId(fileHandle.getId())
+                                                        .setAssociateObjectType(entityType)
+                                                        .setAssociateObjectId(fileHandle.getId())
 
-        HttpGet entityIDGet = new HttpGet("https://repo-prod.prod.sagebase.org/repo/v1/entity/" + pathString)
-        entityIDGet.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + Synapse_Auth_Token)
-        HttpResponse entityIDGetResponse = httpclient.execute(entityIDGet)
-        HttpEntity entityIDGetEntity = entityIDGetResponse.getEntity()
+        final downloadURL = synapseClient.getFileURL(fileHandleAssociation)
 
-        String entityIDGetResStr = EntityUtils.toString(entityIDGetEntity, StandardCharsets.UTF_8)
-        JsonObject entityIDGetResObj = new JsonParser().parse(entityIDGetResStr).getAsJsonObject()
+        final httpclient = HttpClients.createDefault()
+        final fileContentGet = new HttpGet(downloadURL.toString())
+        final fileContentGetResponse = httpclient.execute(fileContentGet)
+        final fileContentGetEntity = fileContentGetResponse.getEntity()
 
-        if(!entityIDGetResObj.get("dataFileHandleId")) {
-            throw new IOException("Cannot retrieve response from: " + entityIDGet.toString()
-                    + "\nPlease check your token, try again later or raise a bug ticket!")
-        }
-
-        Integer dataFileHandleId = (Integer) entityIDGetResObj.get("dataFileHandleId").getAsBigInteger()
-
-        HttpGet absoluteURLGet = new HttpGet("https://repo-prod.prod.sagebase.org/file/v1/file/" + dataFileHandleId + "?fileAssociateType=FileEntity&fileAssociateId=" + dataFileHandleId)
-        absoluteURLGet.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + Synapse_Auth_Token)
-        httpclient.execute(absoluteURLGet, context)
-
-        HttpHost target = context.getTargetHost()
-        List<URI> redirectLocations = context.getRedirectLocations()
-        URI absoluteURL = URIUtils.resolve(absoluteURLGet.getURI(), target, redirectLocations)
-
-        HttpGet fileContentGet = new HttpGet(absoluteURL.toASCIIString())
-        HttpResponse fileContentGetResponse = httpclient.execute(fileContentGet)
-        HttpEntity fileContentGetEntity = fileContentGetResponse.getEntity()
-
-        InputStream inputStream = fileContentGetEntity.getContent()
-        log.trace('Stream' + inputStream)
+        final inputStream = fileContentGetEntity.getContent()
 
         return inputStream
     }
