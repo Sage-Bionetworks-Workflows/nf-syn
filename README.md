@@ -1,6 +1,18 @@
-# nf-synapse plugin 
+# Synapse
+Synapse is a collaborative, open-source research platform that allows teams to share data, track analyses, and collaborate.
+- More info: [Synapse Homepage](https://help.synapse.org/docs/)
+
+# Nextflow
+Nextflow is a reactive workflow framework and a programming Domain-specific language that eases the writing of data-intensive computational pipelines.
+- More info: [Nextflow Homepage](https://help.synapse.org/docs/)
+
+# Custom File System Provider
+The NIO.2 API introduced in the Java SE 7 release provides the ability to develop a custom file system provider that can be used to manage file system objects. A file system is essentially a container with organized, homogenous elements referred to as file system objects. A file system provides access to file system objects. A file system object can be a file store, file, or directory. A file store is a volume or partition in which files are stored. For example, in a native file system such as on the Windows platform, commonly known drives like c: or d: are file stores. On the Solaris operating system, / (root) and mounted directories are considered file stores.
+- More info: [Oracle Java Documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/io/fsp/filesystemprovider.html)
+
+# nf-Synapse plugin 
  
-This project shows how to implement a simple Nextflow plugin named `nf-synapse` that implements the support for Synapse's Entity storage with customized Synapse File System Provider.
+This project implements a Nextflow plugin named `nf-synapse` that creates the support for Synapse's Entity storage with customized Synapse File System Provider.
 
 ## Plugin assets 
                     
@@ -48,13 +60,6 @@ Among others, nextflow-core integrate following sub ExtensionPointS:
 - `ChannelExtensionPoint` to enrich the channel with custom methods
 
 In this plugin you can find examples for both of them
-
-## Compile & run unit tests 
-
-Run the following command in the project root directory (ie. where the file `settings.gradle` is located):
-
-    ./gradlew check
-
 ## Run and debug plugin in the development environment
 
 To run and test the plugin in the development environment, configure a local Nextflow build 
@@ -79,10 +84,74 @@ using the following steps:
     ```
     cd ../nf-synapse && ./gradlew compileGroovy
     ```
-6. While inside `nf-synapse`, run Nextflow with `nf-synapse` plugin on the sample file `synapse_file.nf` (created in this repo) using:
+6. While inside `nf-synapse`, include your Synapse_Auth_Token in `nextflow.config` file:
+    ```
+    plugins {
+        id 'nf-synapse'
+    }
+
+    synapse {
+        authToken='Put_Your_Synapse_Auth_Token_Here'
+    }
+    ```
+7. While inside `nf-synapse`, run Nextflow with `nf-synapse` plugin on the sample file `synapse_file.nf` (created in this repo) using:
     ```
     ./launch.sh run synapse_file.nf -plugins nf-synapse
     ```
+## Project file structures
+
+![Project File Structure](images/file_structures.png)
+
+- `SynapsePlugin.groovy`:  Wrapper for the whole plugin project. It also establishes and installs the customized Synapse FileSystem Provider.
+- `SynapsePathFactory.groovy` and `SynapsePathSerializer.groovy`: Initiation points whenever a user initiates a file using URI.
+- `SynapsePath.groovy`: Implements Synapse path object.
+- `SynapseConfig.groovy`: Implement system env configs for Synapse FileSystem. It includes Synapse Auth Token as one of the requirements for Synapse FileSystem env.
+- `SynapseFileSystemProvider.groovy`: Implements NIO File system provider for Synapse Entity Storage. It includes most the the logic on how to create a new instance of Synapse FileSystem, inititates Synapse Java API Client (that will be used to retrieve the remote Synapse file later), enforces Synapse authentication token and Synapse entity type check.
+  - Some of very important methods: newFileSystem(), getFileSystem(), getPath(), newInputStream(), delete(), copy(), move()...
+- `SynapseFileSystem.groovy`: Implements NIO File system for Synapse Entity Storage.
+    - Some of very important methods: SynapseFileSystem(), getPath(), newInputStream()...
+
+## Compile & run unit tests 
+
+There are 2 ways to run the unit test cases:
+1. Using the command line terminal:
+   - Add variable `SYNAPSE_AUTH_TOKEN` to your system source. For MacOS, you can add the variable by:
+        ```
+        vim ~/.zshrc
+        ```
+        or
+        ```
+        vim ~/.bashrc
+        ```
+        then modify/update the source file with:
+        ``` 
+        export SYNAPSE_AUTH_TOKEN=YOUR_SYNAPSE_AUTH_TOKEN
+        ```
+        then reload the source file with:
+        ```
+        source ~/.zshrc
+        ```
+        or
+        ```
+        source ~/.bashrc
+        ```
+
+   - Run the following command in the project root directory (ie. where the file `settings.gradle` is located):
+        ```
+        ./gradlew check
+        ```
+2. Using IntelliJ:
+   - Edit the test config:
+  ![Project File Structure](images/intellij_test_config_run.png)
+   - Put your Synapse Auth Token as one of the `Environment variables`:
+  ![Project File Structure](images/intellij_test_config_menu.png)
+   - Then run the test suite using IntelliJ
+
+## Logging
+Currently, in various methods, `log.trace` is being used. Whenever you run a .nf files with flag `-trace`, the `.nextflow.log` files will output results from `log.trace`
+```
+./gradlew compileGroovy && ./launch.sh -trace nextflow.synapse run synapse_file.nf -plugins nf-synapse
+```
 
 ## Package, upload and publish
 
