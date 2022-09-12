@@ -66,13 +66,13 @@ class SynapsePathFactory extends FileSystemPathFactory {
     protected String getBashLib(Path target) {
         log.trace 'Inside getBashLib() from FileSystemPathFactory'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation getBashLib() in SynapsePathFactory is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     protected String getUploadCmd(String source, Path target) {
         log.trace 'Inside getUploadCmd() from FileSystemPathFactory'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation getUploadCmd() in SynapsePathFactory is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 }

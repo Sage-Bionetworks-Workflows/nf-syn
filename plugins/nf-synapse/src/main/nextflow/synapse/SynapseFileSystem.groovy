@@ -74,49 +74,49 @@ class SynapseFileSystem extends FileSystem {
     void close() throws IOException {
         log.trace 'Inside close() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation close() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     boolean isOpen() {
         log.trace 'Inside isOpen() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation isOpen() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     boolean isReadOnly() {
         log.trace 'Inside isReadOnly() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation isReadOnly() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     String getSeparator() {
         log.trace 'Inside getSeparator() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation getSeparator() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Iterable<Path> getRootDirectories() {
         log.trace 'Inside getRootDirectories() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation getRootDirectories() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Iterable<FileStore> getFileStores() {
         log.trace 'Inside getFileStores() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation getFileStores() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Set<String> supportedFileAttributeViews() {
         log.trace 'Inside supportedFileAttributeViews() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation supportedFileAttributeViews() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
@@ -130,21 +130,21 @@ class SynapseFileSystem extends FileSystem {
     PathMatcher getPathMatcher(String syntaxAndPattern) {
         log.trace 'Inside getPathMatcher() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation getPathMatcher() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     UserPrincipalLookupService getUserPrincipalLookupService() {
         log.trace 'Inside getUserPrincipalLookupService() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation getUserPrincipalLookupService() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     WatchService newWatchService() throws IOException {
         log.trace 'Inside newWatchService() from FileSystem'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation newWatchService() in SynapseFileSystem is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     static InputStream newInputStream(SynapsePath path) throws IOException {

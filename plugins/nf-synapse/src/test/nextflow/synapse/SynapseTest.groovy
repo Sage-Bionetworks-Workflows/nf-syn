@@ -17,6 +17,7 @@ package nextflow.synapse
 
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException
 import spock.lang.Requires
+import spock.lang.Shared
 import spock.lang.Specification
 
 import java.nio.charset.Charset
@@ -31,13 +32,25 @@ import java.nio.file.Paths
  */
 @Requires({System.getenv('SYNAPSE_AUTH_TOKEN')})
 class SynapseTest extends Specification {
+
+    // Please create a file name 'TxtTestFile.txt' and upload the file into your Synapse repo
+    // The file should have the content as 'This is a test file'
+    // Copy & Paste the Syn ID here
+    @Shared
+    def fileEntityWithContent = 'syn://syn33282971'
+
+    // Please create a dataset in your Synapse repo
+    // Copy & Paste the Syn ID here
+    @Shared
+    def invalidEntity = 'syn://syn35358478'
+
     def 'should return error missing token' () {
         given:
         def env = [SYNAPSE_AUTH_TOKEN: null]
         def synapseFileProvider = Spy(SynapseFileSystemProvider)
 
         when:
-        synapseFileProvider.newFileSystem(new URI("syn://syn32193541"), env)
+        synapseFileProvider.newFileSystem(new URI(fileEntityWithContent), env)
 
         then:
         thrown(IllegalArgumentException)
@@ -49,7 +62,7 @@ class SynapseTest extends Specification {
         def synapseFileProvider = Spy(SynapseFileSystemProvider)
 
         when:
-        synapseFileProvider.newFileSystem(new URI("syn://syn32193541"), env)
+        synapseFileProvider.newFileSystem(new URI(fileEntityWithContent), env)
 
         then:
         thrown(SynapseUnauthorizedException)
@@ -64,7 +77,7 @@ class SynapseTest extends Specification {
 
     def 'should read a file content' () {
         given:
-        def synapseFilePath = Paths.get(new URI("syn://syn33282971"))
+        def synapseFilePath = Paths.get(new URI(fileEntityWithContent))
         expect:
         Files.readAllLines(synapseFilePath, Charset.forName('UTF-8')).get(0) == 'This is a test file'
     }
@@ -75,8 +88,8 @@ class SynapseTest extends Specification {
         def synapseFileProvider = Spy(SynapseFileSystemProvider)
 
         when:
-        synapseFileProvider.newFileSystem(new URI("syn://syn32193541"), env)
-        synapseFileProvider.newFileSystem(new URI("syn://syn32193541"), env)
+        synapseFileProvider.newFileSystem(new URI(fileEntityWithContent), env)
+        synapseFileProvider.newFileSystem(new URI(fileEntityWithContent), env)
 
         then:
         thrown(FileSystemAlreadyExistsException)
@@ -84,13 +97,13 @@ class SynapseTest extends Specification {
 
     def 'should create local file' () {
         given:
-        def synapseFileInputStream = Files.newInputStream(Paths.get(new URI("syn://syn32193541")))
+        def synapseFileInputStream = Files.newInputStream(Paths.get(new URI(fileEntityWithContent)))
 
-        def localTestFile = new File("../../../SynapseTestPDFFile.pdf")
+        def localTestFile = new File("../../../TxtTestFile.txt")
 
         if (localTestFile.exists()) {
             localTestFile.delete()
-            localTestFile = new File("../../../SynapseTestPDFFile.pdf")
+            localTestFile = new File("../../../TxtTestFile.txt")
         }
 
         Files.copy(synapseFileInputStream, localTestFile.toPath())
@@ -103,12 +116,12 @@ class SynapseTest extends Specification {
         }
 
         expect:
-        lineCount == 3075
+        lineCount == 1
     }
 
     def 'should return error entity type not supported' () {
         when:
-        Paths.get(new URI("syn://syn35358478"))
+        Paths.get(new URI(invalidEntity))
 
         then:
         thrown(IllegalArgumentException)

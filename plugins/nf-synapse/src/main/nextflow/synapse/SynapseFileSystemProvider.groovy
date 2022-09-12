@@ -140,7 +140,7 @@ class SynapseFileSystemProvider extends FileSystemProvider {
     SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs) throws IOException {
         log.trace 'Inside newByteChannel() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation newByteChannel() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
@@ -163,90 +163,90 @@ class SynapseFileSystemProvider extends FileSystemProvider {
     DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter) throws IOException {
         log.trace 'Inside newDirectoryStream() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation newDirectoryStream() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     void createDirectory(Path dir, FileAttribute<?>... attrs) throws IOException {
         log.trace 'Inside createDirectory() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation createDirectory() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     void delete(Path path) throws IOException {
         log.trace 'Inside delete() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation delete() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     void copy(Path source, Path target, CopyOption... options) throws IOException {
         log.trace 'Inside copy() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation copy() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     void move(Path source, Path target, CopyOption... options) throws IOException {
         log.trace 'Inside move() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation move() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     boolean isSameFile(Path path, Path path2) throws IOException {
         log.trace 'Inside isSameFile() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation isSameFile() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     boolean isHidden(Path path) throws IOException {
         log.trace 'Inside isHidden() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation isHidden() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     FileStore getFileStore(Path path) throws IOException {
         log.trace 'Inside getFileStore() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation getFileStore() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     void checkAccess(Path path, AccessMode... modes) throws IOException {
         log.trace 'Inside checkAccess() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation checkAccess() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
         log.trace 'Inside getFileAttributeView() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation getFileAttributeView() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
         log.trace 'Inside readAttributes(Path path, Class<A> type, LinkOption... options) from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation readAttributes() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
         log.trace 'Inside readAttributes(Path path, String attributes, LinkOption... options) from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation readAttributes() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 
     @Override
     void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
         log.trace 'Inside setAttribute() from FileSystemProvider'
 
-        throw new UnsupportedOperationException("Operation is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
+        throw new UnsupportedOperationException("Operation setAttribute() in SynapseFileSystemProvider is not supported. Please contact nf-synapse plugin admin & raise a ticket in gitHub repo!")
     }
 }
