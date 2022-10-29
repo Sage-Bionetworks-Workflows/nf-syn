@@ -4,7 +4,7 @@ Synapse is a collaborative, open-source research platform that allows teams to s
 
 # Nextflow
 Nextflow is a reactive workflow framework and a programming Domain-specific language that eases the writing of data-intensive computational pipelines.
-- More info: [Nextflow Homepage](https://help.synapse.org/docs/)
+- More info: [Nextflow Homepage](https://www.nextflow.io/)
 
 # Custom File System Provider
 The NIO.2 API introduced in the Java SE 7 release provides the ability to develop a custom file system provider that can be used to manage file system objects. A file system is essentially a container with organized, homogenous elements referred to as file system objects. A file system provides access to file system objects. A file system object can be a file store, file, or directory. A file store is a volume or partition in which files are stored. For example, in a native file system such as on the Windows platform, commonly known drives like c: or d: are file stores. On the Solaris operating system, / (root) and mounted directories are considered file stores.
@@ -112,6 +112,7 @@ using the following steps:
     - Some of very important methods: SynapseFileSystem(), getPath(), newInputStream()...
 
 ## Compile & run unit tests 
+Right now the user who wants to run the test cases will have to following the extra instructions inside `SynapseTest`. Particularly you will have to manually create the test mock .txt file in your Synapse repo and copy/paste the Synapse Id into `SynapseTest`. For future development, please use `Synapse Java API Client` to automate the process of create file -> upload file -> retrieve id -> delete file in Synapse repo remotely.
 
 There are 2 ways to run the unit test cases:
 1. Using the command line terminal:
